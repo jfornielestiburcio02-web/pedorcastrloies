@@ -72,23 +72,23 @@ function tienePermiso($lista, $nombreRol) {
     <?php else: ?>
         
         <?php if (tienePermiso($misRoles, 'EsDireccion')): ?>
-            <a href="CEC.php?p=DIR" class="boton-perfil">EQUIPO DIRECTIVO</a>
+            <a href="CEC.php?p=DIR&ALEATORIO=LSLDOWKODKOKDOEKE" class="boton-perfil">EQUIPO DIRECTIVO</a>
         <?php endif; ?>
 
         <?php if (tienePermiso($misRoles, 'EsSecretaria')): ?>
-            <a href="CEC.php?p=SEC" class="boton-perfil">GESTIÓN DE SECRETARÍA</a>
+            <a href="CEC.php?p=SEC&ALEATORIO=LSLDOWKODKOKDOEKE" class="boton-perfil">GESTIÓN DE SECRETARÍA</a>
         <?php endif; ?>
 
         <?php if (tienePermiso($misRoles, 'EsProfesor')): ?>
-            <a href="CEC.php?p=PRO" class="boton-perfil">PERFIL DOCENTE</a>
+            <a href="CEC.php?p=PRO&ALEATORIO=LSLDOWKODKOKDOEKE" class="boton-perfil">PERFIL DOCENTE</a>
         <?php endif; ?>
 
         <?php if (tienePermiso($misRoles, 'EsAlumno')): ?>
-            <a href="CEC.php?p=ALU" class="boton-perfil">PERFIL ALUMNADO</a>
+            <a href="CEC.php?p=ALU&ALEATORIO=LSLDOWKODKOKDOEKE" class="boton-perfil">PERFIL ALUMNADO</a>
         <?php endif; ?>
 
         <?php if (tienePermiso($misRoles, 'EsCiudadano')): ?>
-            <a href="CEC.php?p=CIU" class="boton-perfil">PERFIL CIUDADANO</a>
+            <a href="CEC.php?p=CIU&ALEATORIO=LSLDOWKODKOKDOEKE" class="boton-perfil">PERFIL CIUDADANO</a>
         <?php endif; ?>
 
     <?php endif; ?>
