@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['USUARIO'])) {
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tbody>
                         <tr>
-                            <td><img src="https://i.imgur.com/8Y0Rk6c.gif" height="157" width="230"></td>
+                            <td><img src="https://cdn.discordapp.com/icons/1418980286594682892/afdaf4df1fe41b2215917ec0a74c1c63.webp?size=128&quality=lossless" height="157" width="230"></td>
                             <td align="right" height="165" valign="bottom">&nbsp;</td>
                         </tr>
                     </tbody>
