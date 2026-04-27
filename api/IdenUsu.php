@@ -1,5 +1,5 @@
 <?php
-// --- LÓGICA DE FIREBASE Y REDIRECCIÓN ---
+// --- LÓGICA DE FIREBASE Y REDIRECCIÓN CON COOKIE ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['USUARIO'])) {
     $config = [
         "projectId" => "studio-5014911262-ee6e6",
@@ -25,14 +25,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['USUARIO'])) {
         $passwordEnBD = $resData['fields']['contrasena']['stringValue'];
 
         if ($claveRecibida === $passwordEnBD) {
-            // --- GENERAR CADENA ALEATORIA DE MAYÚSCULAS ---
+            
+            // 1. GUARDAR EL USUARIO EN UNA COOKIE (Dura 1 hora)
+            // Esto permite que cambiaPerfil.php sepa quién eres.
+            setcookie("user_id", $usuarioRecibido, time() + 3600, "/");
+
+            // 2. GENERAR CADENA ALEATORIA
             $caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             $letrasAleatorias = '';
             for ($i = 0; $i < 15; $i++) {
                 $letrasAleatorias .= $caracteres[rand(0, strlen($caracteres) - 1)];
             }
 
-            // --- REDIRECCIÓN ---
+            // 3. REDIRECCIÓN
             header("Location: /cambiaPerfil.php?ALEATORIO=" . $letrasAleatorias);
             exit; 
         } else {
@@ -43,8 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['USUARIO'])) {
     }
 }
 ?>
-
-
 
 
 
