@@ -1,23 +1,20 @@
 <?php
-// 1. SEGURIDAD: Si no hay cookie de usuario, fuera.
 if (!isset($_COOKIE['user_id'])) {
     header("Location: IdenUsu.php");
     exit;
 }
 
-// 2. CAPTURAR EL PERFIL Y EL ALEATORIO
-$perfilCod = $_GET['p'] ?? 'CIU'; // Por defecto Ciudadano si no viene nada
+$perfilCod = $_GET['p'] ?? 'CIU';
 $aleatorio = $_GET['ALEATORIO'] ?? '';
 
-// Si no viene aleatorio por URL (porque viene de cambiaPerfil), generamos uno nuevo aquí
 if (empty($aleatorio)) {
     $caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $aleatorio = '';
     for ($i = 0; $i < 15; $i++) {
         $aleatorio .= $caracteres[rand(0, strlen($caracteres) - 1)];
     }
 }
 
-// 3. MAPEO DE CODIGOS A NOMBRES DE CARPETA (Minúsculas como pediste)
 $mapaCarpetas = [
     'DIR' => 'direccion',
     'SEC' => 'secretaria',
@@ -27,8 +24,6 @@ $mapaCarpetas = [
 ];
 
 $nombreCarpeta = $mapaCarpetas[$perfilCod] ?? 'ciudadano';
-
-// 4. CONSTRUCCIÓN DE LAS URLs DE LOS IFRAMES
 $urlBase = "/contenidoEntradilla";
 $param   = "?ALEATORIO=" . $aleatorio;
 
@@ -38,37 +33,54 @@ $urlContenido = $urlBase . "/contenidoEntero/" . $nombreCarpeta . "/Principal.js
 ?>
 <html>
 <head>
-    <title>Plataforma Rayuela - <?php echo strtoupper($nombreCarpeta); ?></title>
+    <title>Rayuela - <?php echo strtoupper($nombreCarpeta); ?></title>
     <style>
-        body, html {
-            margin: 0; padding: 0; height: 100%; overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        /* Layout de frames: Cabecera arriba, Abajo Sidebar y Contenido */
-        #contenedor-principal {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
+        
+        #contenedor-principal { display: flex; flex-direction: column; height: 100vh; }
+
+        /* CABECERA: Ahora más pequeña (60px) */
         #frame-cabecera {
             width: 100%;
-            height: 150px; /* Ajusta según el diseño original */
+            height: 60px; 
             border: none;
+            background-color: #9A6289;
+            z-index: 10;
         }
-        #cuerpo-inferior {
-            display: flex;
-            flex: 1; /* Ocupa el resto de la pantalla */
+
+        #cuerpo-inferior { display: flex; flex: 1; position: relative; }
+
+        /* SIDEBAR: Efecto Hover */
+        #contenedor-sidebar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 15px; /* Zona sensible al ratón muy estrecha */
+            z-index: 100;
+            transition: width 0.3s ease;
+            background-color: #BE9BB4;
+            overflow: hidden;
         }
+
+        #contenedor-sidebar:hover {
+            width: 250px; /* Ancho que se abre al pasar el ratón */
+            box-shadow: 2px 0px 10px rgba(0,0,0,0.3);
+        }
+
         #frame-sidebar {
-            width: 250px; /* Ancho del menú lateral */
+            width: 250px;
             height: 100%;
             border: none;
-            border-right: 1px solid #9A6289;
         }
+
+        /* CONTENIDO: Ocupa todo el fondo */
         #frame-contenido {
             flex: 1;
+            width: 100%;
             height: 100%;
             border: none;
+            margin-left: 15px; /* Para no tapar la zona sensible */
         }
     </style>
 </head>
@@ -76,11 +88,13 @@ $urlContenido = $urlBase . "/contenidoEntero/" . $nombreCarpeta . "/Principal.js
 
 <div id="contenedor-principal">
     
-    <iframe src="<?php echo $urlCabecera; ?>" id="frame-cabecera" name="cabecera"></iframe>
+    <iframe src="<?php echo $urlCabecera; ?>" id="frame-cabecera" scrolling="no"></iframe>
 
     <div id="cuerpo-inferior">
         
-        <iframe src="<?php echo $urlSidebar; ?>" id="frame-sidebar" name="sidebar"></iframe>
+        <div id="contenedor-sidebar">
+            <iframe src="<?php echo $urlSidebar; ?>" id="frame-sidebar"></iframe>
+        </div>
 
         <iframe src="<?php echo $urlContenido; ?>" id="frame-contenido" name="contenido"></iframe>
 
