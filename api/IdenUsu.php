@@ -253,7 +253,7 @@ input {
             <tbody>
                 <tr>
                     <td>
-                        <form name="FORMULARIO_IDEN_USU" method="POST" action="login.php">
+                        <form name="FORMULARIO_IDEN_USU" method="POST" action="ComprobarUsuario.php">
                             <table align="center" border="0" cellpadding="0" cellspacing="0">
                                 <tbody>
                                     <tr align="center">
