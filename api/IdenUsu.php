@@ -1,289 +1,136 @@
+<?php
+// --- LÓGICA DE FIREBASE (SOLO SE EJECUTA AL ENVIAR EL FORMULARIO) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['USUARIO'])) {
+    $config = [
+        "projectId" => "studio-5014911262-ee6e6",
+        "apiKey"    => "AIzaSyCpQ7ra0eLj8kskc_3hxCJSlV_z8N6nPy4"
+    ];
+
+    $usuario = $_POST['USUARIO'];
+    $clave   = $_POST['CLAVECIFRADA']; 
+
+    $url = "https://firestore.googleapis.com/v1/projects/" . $config['projectId'] . "/databases/(default)/documents/usuarios/" . urlencode($usuario) . "?key=" . $config['apiKey'];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $resData = json_decode($response, true);
+
+    if ($httpCode == 200 && isset($resData['fields']['contrasena']['stringValue'])) {
+        if ($clave === $resData['fields']['contrasena']['stringValue']) {
+            die("<h1>IDENTIFICACIÓN CORRECTA. BIENVENIDO $usuario</h1>");
+        } else {
+            echo "<script>alert('Clave incorrecta');</script>";
+        }
+    } else {
+        echo "<script>alert('Usuario no encontrado');</script>";
+    }
+}
+?>
 <html>
 <head>
     <title>Identificación</title>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <SCRIPT SRC="../scripts/consejeria/cifrado.js"></SCRIPT>
-    
     <script type="text/javascript">
-    function comprobarclave(){
-        var form = document.forms['FORMULARIO_IDEN_USU'];
-        if(form['USUARIO'].value == "") {
-            alert("El campo 'Usuario' es obligatorio");
-        } else if(form['CLAVE'].value == "") {
-            alert("El campo 'Clave' es obligatorio");
-        } else {
-            // Ciframos la clave antes de enviar (como pedía tu código original)
-            form['CLAVECIFRADA'].value = cifrar(form['CLAVE'].value);
-            // Limpiamos el campo original por seguridad
-            form['CLAVE'].value = "";
-            form.submit();
+        window.name = "NV_1777297125896";
+        function comprobarclave(){
+            if(document.forms[0]['USUARIO'].value=="") {
+                alert("El campo 'Usuario' es obligatorio");
+            } else if(document.forms[0]['CLAVE'].value=="") {
+                alert("El campo 'Clave' es obligatorio");
+            } else {
+                // Aquí se usa tu función cifrar() del script externo
+                document.forms[0]['CLAVECIFRADA'].value = cifrar(document.forms[0]['CLAVE'].value);
+                document.forms[0]['CLAVE'].value = "";
+                document.forms[0].submit();
+            }
         }
-    }
     </script>
     <style>
-.morado {
-	background-color: #9A6289
-}
-
-.blanco {
-	background-color: #FFFFFF
-}
-
-.lila {
-	background-color: #BE9BB4
-}
-
-.moradoclaro {
-	background-color: #DBC6D4
-}
-
-.verdeagua {
-	background-color: #B7DDC8
-}
-
-.verde {
-	background-color: #B3D76B
-}
-
-.naranja {
-	background-color: #EAB863
-}
-
-.botones {
-	background-color: #FFFFFF;
-	padding-top: 2px;
-	padding-right: 2px;
-	padding-bottom: 2px;
-	padding-left: 2px;
-	border: 1px #6B4560 solid;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: normal;
-	color: #000000;
-	width: 100px;
-	text-decoration: none
-}
-
-.botones:hover {
-	background-color: #DDCAD8;
-	padding-top: 2px;
-	padding-right: 2px;
-	padding-bottom: 2px;
-	padding-left: 2px;
-	border: 1px #6B4560 solid;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: normal;
-	color: #5A3A51;
-	text-decoration: none;
-}
-
-input {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: bold;
-	color: #573957;
-	text-decoration: none;
-	background-color: #DBC6D4;
-	border: #FFFFFF;
-	border-style: solid;
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px
-}
-
-.input_check {
-	background-color: transparent;
-	border: none;
-}
-
-.usuario {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	font-weight: bold;
-	color: #FFFFFF;
-	text-decoration: none
-}
-
-.usuarioMostrar {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	font-weight: bold;
-	color: #B3D76B;
-	text-decoration: none
-}
-
-.mensaje {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 12pt;
-	font-weight: bold;
-	color: #E8FF48;
-	text-decoration: none
-}
-
-.botones2 {
-	background-color: #F0AA94;
-	padding-top: 2px;
-	padding-right: 2px;
-	padding-bottom: 2px;
-	padding-left: 2px;
-	text-align: center;
-	border: 1px #E77551 solid;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: bold;
-	color: #903214;
-	width: 100px;
-	text-decoration: none
-}
-
-.botones2:hover {
-	background-color: #B3D76B;
-	padding-top: 2px;
-	padding-right: 2px;
-	padding-bottom: 2px;
-	padding-left: 2px;
-	border: 1px solid;
-	text-align: center;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 8pt;
-	font-weight: bold;
-	color: #000000;
-	text-decoration: none;
-	border-color: #799F2B #669933 #669933
-}
-
-.titulo {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-	font-weight: bold;
-	color: #FFFFFF;
-	text-decoration: none;
-	background-color: #9A6289;
-	width: 100%;
-	padding-left: 10px
-}
-
-.txtblanco {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-	text-align: justify;
-	font-weight: normal;
-	color: #FFFFFF;
-	text-decoration: none;
-	padding-top: 4px;
-	padding-right: 4px;
-	padding-bottom: 4px;
-	padding-left: 10px
-}
-
-.txtpositivo {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-	font-weight: bold;
-	color: #FFFFFF;
-	text-decoration: none;
-	padding-top: 4px;
-	padding-right: 4px;
-	padding-bottom: 4px;
-	padding-left: 10px
-}
-
-.txtidentificacion {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-	font-weight: bold;
-	color: #DBC6D4;
-	text-decoration: none;
-	padding-top: 4px;
-	padding-right: 4px;
-	padding-bottom: 4px;
-	padding-left: 10px
-}
-
-.txtmensajeerror {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-	font-weight: normal;
-	color: #FF9900;
-	text-decoration: none;
-	padding-top: 4px;
-	padding-right: 4px;
-	padding-bottom: 4px;
-	padding-left: 10px;
-	text-align: justify;
-}
-
-.lista {
-	background-image: url(secretaria_on.gif);
-	background-repeat: no-repeat;
-	background-position: 5px 5px
-}
-
-.txtcabecera {
-	font-family: impact, Arial, Helvetica, sans-serif;
-	background-color: #8D5A7E;
-	color: #FFFFFF;
-	font-size: 18pt
-}
-
-.blanco a {
-	color: #B3D76B;
-	font-family: tahoma;
-	font-size: 14pt;
-	text-decoration: none;
-}
-
-.txtmensajeerror
-{
-	color:#FF9900;
-	font-family:Arial,Helvetica,sans-serif;
-	font-size:10pt;
-	font-weight:normal;
-	padding:4px 4px 4px 10px;
-	text-align:justify;
-	text-decoration:none;
-}
+        .morado { background-color: #9A6289 }
+        .blanco { background-color: #FFFFFF }
+        .lila { background-color: #BE9BB4 }
+        .moradoclaro { background-color: #DBC6D4 }
+        .verdeagua { background-color: #B7DDC8 }
+        .verde { background-color: #B3D76B }
+        .naranja { background-color: #EAB863 }
+        .botones { background-color: #FFFFFF; padding: 2px; border: 1px #6B4560 solid; font-family: Arial; font-size: 8pt; color: #000000; width: 100px; text-decoration: none }
+        .botones:hover { background-color: #DDCAD8; color: #5A3A51; }
+        input { font-family: Arial; font-size: 8pt; font-weight: bold; color: #573957; background-color: #DBC6D4; border: 1px #FFFFFF solid; }
+        .usuario { font-family: Arial; font-size: 9pt; font-weight: bold; color: #FFFFFF; }
+        .botones2 { background-color: #F0AA94; padding: 2px; text-align: center; border: 1px #E77551 solid; font-family: Arial; font-size: 8pt; font-weight: bold; color: #903214; width: 100px; text-decoration: none; display: inline-block; }
+        .botones2:hover { background-color: #B3D76B; color: #000000; border-color: #799F2B #669933 #669933 }
+        .titulo { font-family: Arial; font-size: 10pt; font-weight: bold; color: #FFFFFF; background-color: #9A6289; width: 100%; padding-left: 10px }
+        .txtcabecera { font-family: impact, Arial; background-color: #8D5A7E; color: #FFFFFF; font-size: 18pt }
     </style>
 </head>
-<body leftmargin="0" topmargin="0" bgcolor="#ffffff">
-    <td class="morado" height="165" valign="top" width="30%">
-        <table align="center" border="0" cellpadding="0" cellspacing="5" width="90%">
-            <tbody>
-                <tr>
-                    <td>
-                        <form name="FORMULARIO_IDEN_USU" method="POST" action="ComprobarUsuario.php">
-                            <table align="center" border="0" cellpadding="0" cellspacing="0">
-                                <tbody>
-                                    <tr align="center">
-                                        <td class="usuario" height="31" valign="middle">
-                                            Usuario <br>
-                                            <input name="USUARIO" value="" size="20" type="text">
-                                        </td>
-                                    </tr>
-                                    <tr align="center">
-                                        <td class="usuario">
-                                            Contraseña<br>
-                                            <input name="CLAVE" value="" size="20" type="password">
-                                            <input name="CLAVECIFRADA" value="" type="hidden">
-                                        </td>
-                                    </tr>
-                                    <tr align="center">
-                                        <td>
-                                            <br>
-                                            <a href="javascript:comprobarclave();" class="botones2">
-                                                &nbsp;&nbsp;&nbsp;Entrar&nbsp;&nbsp;&nbsp;
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </td>
-    </body>
+<body leftmargin="0" topmargin="0" bgcolor="#ffffff" marginheight="0" marginwidth="0">
+<table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%">
+    <tbody>
+        <tr>
+            <td colspan="2" width="60%">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tbody>
+                        <tr>
+                            <td><img src="../images/puertaTrasera/logo_rayuela.gif" height="157" width="230"></td>
+                            <td align="right" height="165" valign="bottom">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td class="morado" height="165" valign="top" width="30%">
+                <table align="center" border="0" cellpadding="0" cellspacing="5" width="90%">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <form name="FORMULARIO_IDEN_USU" method="POST" action="IDENUSU.PHP">
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                            <tr align="center">
+                                                <td class="usuario" height="31" valign="middle" width="75%">
+                                                    Usuario <br>
+                                                    <input name="USUARIO" value="" size="20" type="text">
+                                                </td>
+                                            </tr>
+                                            <tr align="center">
+                                                <td class="usuario" width="75%"><br>
+                                                    Contraseña<br>
+                                                    <input name="CLAVE" value="" size="20" type="password">
+                                                    <input name="CLAVECIFRADA" value="" type="hidden">
+                                                </td>
+                                            </tr>
+                                            <tr><td width="75%">&nbsp;</td></tr>
+                                            <tr align="center">
+                                                <td width="75%">
+                                                    <div align="center">
+                                                        <a href="javascript:comprobarclave();" class="botones2">
+                                                            &nbsp;&nbsp;&nbsp;Entrar&nbsp;&nbsp;&nbsp;
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td width="35%">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="lila" height="100"></td>
+            <td class="moradoclaro" align="right" height="100"></td>
+            <td class="lila" align="left" height="100"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
 </html>
