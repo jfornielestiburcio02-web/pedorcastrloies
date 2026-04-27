@@ -10,8 +10,8 @@
       "dest": "/api/index.php"
     },
     {
-      "src": "/sempresa/",
-      "dest": "/api/sempresa/index.php"
+      "src": "/CambiaPerfil.php",
+      "dest": "/api/CambiaPerfil.php"
     },
     {
       "src": "/ayudas/ayudaconapis.html",
