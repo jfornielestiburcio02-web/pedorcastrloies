@@ -27,9 +27,9 @@ $nombreCarpeta = $mapaCarpetas[$perfilCod] ?? 'ciudadano';
 $urlBase = "/contenidoEntradilla";
 $param   = "?ALEATORIO=" . $aleatorio;
 
-$urlCabecera  = $urlBase . "/cabecera/" . $nombreCarpeta . "/Principal.jsp" . $param;
-$urlSidebar   = $urlBase . "/sidebar/" . $nombreCarpeta . "/Principal.jsp" . $param;
-$urlContenido = $urlBase . "/contenidoEntero/" . $nombreCarpeta . "/Principal.jsp" . $param;
+$urlCabecera  = $urlBase . "/cabecera/" . $nombreCarpeta . "/Principal.php" . $param;
+$urlSidebar   = $urlBase . "/sidebar/" . $nombreCarpeta . "/Principal.php" . $param;
+$urlContenido = $urlBase . "/contenidoEntero/" . $nombreCarpeta . "/Principal.php" . $param;
 ?>
 <html>
 <head>
