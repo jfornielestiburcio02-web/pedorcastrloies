@@ -35,8 +35,8 @@ if (!in_array('EsProfesor', $misRoles)) {
 }
 
 // 4. DATOS DEL PROFESOR
-$nombre = $fields['nombrePersona']['stringValue'] ?? 'Usuario';
-$foto = $fields['imagenPerfil']['stringValue'] ?? 'https://via.placeholder.com/40';
+$nombre = $fields['nombrePersona']['stringValue'] ?? 'SIN IDENTIFICACIÓN';
+$foto = $fields['imagenPerfil']['stringValue'] ?? '';
 ?>
 <html>
 <head>
@@ -102,7 +102,7 @@ $foto = $fields['imagenPerfil']['stringValue'] ?? 'https://via.placeholder.com/4
             var perfil = select.value;
             if(perfil !== "") {
                 // El cambio de perfil afecta a toda la ventana principal (parent)
-                window.parent.location.href = "menu.php?p=" + perfil + "&ALEATORIO=<?php echo $aleatorio; ?>";
+                window.parent.location.href = "/CEC.php?p=" + perfil + "&ALEATORIO=<?php echo $aleatorio; ?>";
             }
         }
     </script>
@@ -137,7 +137,7 @@ $foto = $fields['imagenPerfil']['stringValue'] ?? 'https://via.placeholder.com/4
                 <option value="CIU">Ciudadano</option>
             <?php endif; ?>
         </select>
-        <a href="IdenUsu.php" target="_parent" style="color: #FF9900; margin-left: 15px; font-weight: bold; text-decoration: none;">SALIR</a>
+        <a href="IdenUsu.php" target="_parent" style="color: #FF9900; margin-left: 15px; font-weight: bold; text-decoration: none;">X</a>
     </div>
 
 </body>
