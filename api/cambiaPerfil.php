@@ -1,14 +1,21 @@
 <?php
-// --- CONFIGURACIÓN ---
+// 1. VERIFICACIÓN DE SEGURIDAD (Leer la cookie)
+if (!isset($_COOKIE['user_id'])) {
+    // Si no hay cookie, el usuario no ha pasado por el login
+    header("Location: IdenUsu.php");
+    exit;
+}
+
+$usuarioLogueado = $_COOKIE['user_id'];
+$aleatorio = $_GET['ALEATORIO'] ?? 'SIN_CLAVE';
+
+// 2. CONFIGURACIÓN DE FIRESTORE
 $config = [
     "projectId" => "studio-5014911262-ee6e6",
     "apiKey"    => "AIzaSyCpQ7ra0eLj8kskc_3hxCJSlV_z8N6nPy4"
 ];
 
-// 1. OBTENER EL USUARIO (Deberías usar sesiones, pero para este ejemplo lo simulamos)
-// En un sistema real, aquí recuperarías el usuario que se acaba de loguear.
-$usuarioLogueado = "nombre_del_usuario"; // Sustituir por variable de sesión
-
+// URL para obtener el documento del usuario y sus roles
 $url = "https://firestore.googleapis.com/v1/projects/" . $config['projectId'] . "/databases/(default)/documents/usuarios/" . urlencode($usuarioLogueado) . "?key=" . $config['apiKey'];
 
 $ch = curl_init();
@@ -16,71 +23,117 @@ curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 $resData = json_decode($response, true);
+
+// Extraemos el mapa de rolesUsuario
+// Estructura esperada en Firestore: rolesUsuario (Map) -> EsProfesor (String), etc.
 $roles = $resData['fields']['rolesUsuario']['mapValue']['fields'] ?? [];
 
-// Función auxiliar para verificar si un rol es "true" o existe
-function tieneRol($roles, $nombreRol) {
-    return isset($roles[$nombreRol]['stringValue']) && ($roles[$nombreRol]['stringValue'] === "S" || $roles[$nombreRol]['stringValue'] === "true");
+/**
+ * Función para validar si el rol está activo (Valor "S")
+ */
+function tienePermiso($roles, $key) {
+    return (isset($roles[$key]['stringValue']) && $roles[$key]['stringValue'] === "S");
 }
 ?>
 <html>
 <head>
-    <title>Selección de Perfil</title>
+    <title>Cambio de Perfil - Rayuela</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <style>
-        .titulo_seccion { font-family: Arial; font-size: 14pt; font-weight: bold; color: #9A6289; padding: 20px; }
-        .opcion_perfil { 
-            display: block; 
-            width: 300px; 
-            margin: 10px auto; 
-            padding: 15px; 
-            background-color: #F0AA94; 
-            border: 1px solid #E77551; 
-            text-align: center; 
-            color: #903214; 
-            font-family: Arial; 
-            font-weight: bold; 
-            text-decoration: none;
+        body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background-color: #FFFFFF; }
+        .morado { background-color: #9A6289; color: white; padding: 10px; }
+        .lila { background-color: #BE9BB4; height: 80px; }
+        .contenedor-perfiles { 
+            width: 500px; 
+            margin: 50px auto; 
+            border: 1px solid #9A6289; 
+            padding: 20px;
+            text-align: center;
         }
-        .opcion_perfil:hover { background-color: #B3D76B; color: #000000; }
-        .contenedor { text-align: center; margin-top: 50px; }
-        .lila { background-color: #BE9BB4; height: 100px; }
+        .titulo-seccion {
+            background-color: #9A6289;
+            color: #FFFFFF;
+            font-weight: bold;
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+        .boton-perfil {
+            display: block;
+            background-color: #F0AA94;
+            border: 1px solid #E77551;
+            color: #903214;
+            padding: 12px;
+            margin: 10px 0;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        .boton-perfil:hover {
+            background-color: #B3D76B;
+            color: #000000;
+            border-color: #799F2B;
+        }
+        .info-user { font-size: 9pt; color: #573957; margin-bottom: 15px; }
     </style>
 </head>
-<body bgcolor="#ffffff">
+<body>
 
-<div class="contenedor">
-    <img src="https://i.imgur.com/8Y0Rk6c.gif" height="100">
-    <div class="titulo_seccion">Seleccione un Perfil de Acceso</div>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td><img src="https://i.imgur.com/8Y0Rk6c.gif" height="120"></td>
+        <td align="right" class="morado">
+            Conectado como: <b><?php echo htmlspecialchars($usuarioLogueado); ?></b>
+        </td>
+    </tr>
+</table>
 
-    <?php if (count($roles) === 0): ?>
-        <p>No se encontraron perfiles para este usuario.</p>
+<div class="contenedor-perfiles">
+    <div class="titulo-seccion">SELECCIONE PERFIL DE ACCESO</div>
+    <div class="info-user">Código de sesión: <?php echo htmlspecialchars($aleatorio); ?></div>
+
+    <?php if (empty($roles)): ?>
+        <p style="color:red;">No tienes perfiles asignados en el sistema.</p>
+    <?php else: ?>
+        
+        <?php if (tienePermiso($roles, 'EsDireccion')): ?>
+            <a href="menu.php?perfil=DIR" class="boton-perfil">EQUIPO DIRECTIVO</a>
+        <?php endif; ?>
+
+        <?php if (tienePermiso($roles, 'EsSecretaria')): ?>
+            <a href="menu.php?perfil=SEC" class="boton-perfil">GESTIÓN DE SECRETARÍA</a>
+        <?php endif; ?>
+
+        <?php if (tienePermiso($roles, 'EsProfesor')): ?>
+            <a href="menu.php?perfil=PRO" class="boton-perfil">PERFIL DOCENTE</a>
+        <?php endif; ?>
+
+        <?php if (tienePermiso($roles, 'EsAlumno')): ?>
+            <a href="menu.php?perfil=ALU" class="boton-perfil">PERFIL ALUMNADO</a>
+        <?php endif; ?>
+
+        <?php if (tienePermiso($roles, 'EsCiudadano')): ?>
+            <a href="menu.php?perfil=CIU" class="boton-perfil">PERFIL CIUDADANO</a>
+        <?php endif; ?>
+
     <?php endif; ?>
 
-    <?php if (tieneRol($roles, 'EsDireccion')): ?>
-        <a href="menu_direccion.php" class="opcion_perfil">EQUIPO DIRECTIVO</a>
-    <?php endif; ?>
-
-    <?php if (tieneRol($roles, 'EsSecretaria')): ?>
-        <a href="menu_secretaria.php" class="opcion_perfil">GESTIÓN DE SECRETARÍA</a>
-    <?php endif; ?>
-
-    <?php if (tieneRol($roles, 'EsProfesor')): ?>
-        <a href="menu_profesor.php" class="opcion_perfil">PERFIL DOCENTE</a>
-    <?php endif; ?>
-
-    <?php if (tieneRol($roles, 'EsAlumno')): ?>
-        <a href="menu_alumno.php" class="opcion_perfil">ACCESO ALUMNO</a>
-    <?php endif; ?>
-
-    <?php if (tieneRol($roles, 'EsCiudadano')): ?>
-        <a href="menu_ciudadano.php" class="opcion_perfil">PERFIL CIUDADANO</a>
-    <?php endif; ?>
-
+    <br>
+    <a href="IdenUsu.php" style="font-size: 8pt; color: #903214;">Cerrar Sesión</a>
 </div>
 
-<div class="lila" style="position: fixed; bottom: 0; width: 100%;"></div>
+<div class="lila" style="position: fixed; bottom: 0; width: 100%;">
+    <table width="100%">
+        <tr>
+            <td align="right" style="padding-top: 20px;">
+                <img src="https://i.imgur.com/8Y0Rk6c.gif" height="40" style="opacity: 0.5;">
+            </td>
+        </tr>
+    </table>
+</div>
+
 </body>
 </html>
