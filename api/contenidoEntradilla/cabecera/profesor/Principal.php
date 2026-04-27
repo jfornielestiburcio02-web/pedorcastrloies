@@ -137,7 +137,7 @@ $foto = $fields['imagenPerfil']['stringValue'] ?? '';
                 <option value="CIU">Ciudadano</option>
             <?php endif; ?>
         </select>
-        <a href="IdenUsu.php" target="_parent" style="color: #FF9900; margin-left: 15px; font-weight: bold; text-decoration: none;">X</a>
+        <a href="/IdenUsu.php?rndval=37149038471" target="_parent" style="color: #FF9900; margin-left: 15px; font-weight: bold; text-decoration: none;">X</a>
     </div>
 
 </body>
